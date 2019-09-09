@@ -5,9 +5,10 @@ const googleMapsClient = require("@google/maps").createClient({
   Promise: Promise
 });
 
+
 router.get("/", (req, res) => {
   googleMapsClient
-    .geocode({ address: "1600 Amphitheatre Parkway, Mountain View, CA" })
+    .placesNearby({ location: [42.351243, -83.061567], radius: 300, type:'restaurant' })
     .asPromise()
     .then(response => {
       console.log(response.json.results);
@@ -16,6 +17,18 @@ router.get("/", (req, res) => {
       console.log(err);
     });
 });
+router.get("/parks", (req, res) => {
+  googleMapsClient
+    .placesNearby({ location: [42.351243, -83.061567], radius: 300, type:'park' })
+    .asPromise()
+    .then(response => {
+      console.log(response.json.results);
+    })
+    .catch(err => {
+      console.log(err);
+    });
+});
+// console.log(httpGet('https://maps.googleapis.com/maps/api/geocode/json?address=1600+Amphitheatre+Parkway,+Mountain+View,+CA&key=YOUR_API_KEY'))
 
 // router.get("/", (req, res) => {
 //   res.send("GET works");
