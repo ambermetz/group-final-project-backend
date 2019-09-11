@@ -4,18 +4,18 @@ const googleMapsClient = require("@google/maps").createClient({
   key: "AIzaSyBTZL4n7tQe8N4VMj9UPTTqOmWUGtO-JHw",
   Promise: Promise
 });
-function geocode(location){
-let coordinates = googleMapsClient.geocode({address: location})
-  .asPromise()
-  .then((response) => {
-    return response.json.results[0].geometry.location;
-
-  })
-  .catch((err) => {
-    console.log(err);
-  });
+function geocode(location) {
+  let coordinates = googleMapsClient
+    .geocode({ address: location })
+    .asPromise()
+    .then(response => {
+      return response.json.results[0].geometry.location;
+    })
+    .catch(err => {
+      console.log(err);
+    });
   return coordinates;
-};
+}
 function getRestaurants(location) {
   let restaurants = googleMapsClient
     .placesNearby({
@@ -27,7 +27,7 @@ function getRestaurants(location) {
     .then(response => {
       return response.json.results;
     })
-    .catch((err) => {
+    .catch(err => {
       console.log(err);
     });
   return restaurants;
@@ -43,7 +43,7 @@ function getMuseums(location) {
     .then(response => {
       return response.json.results;
     })
-    .catch((err) => {
+    .catch(err => {
       console.log(err);
     });
   return museum;
@@ -58,8 +58,8 @@ function getAmusementPark(location) {
     .asPromise()
     .then(response => {
       return response.json.results;
-    }) 
-     .catch((err) => {
+    })
+    .catch(err => {
       console.log(err);
     });
   return amusement_park;
@@ -75,7 +75,7 @@ function getZoo(location) {
     .then(response => {
       return response.json.results;
     })
-    .catch((err) => {
+    .catch(err => {
       console.log(err);
     });
   return zoo;
@@ -92,7 +92,7 @@ function nightClub(location) {
     .then(response => {
       return response.json.results;
     })
-    .catch((err) => {
+    .catch(err => {
       console.log(err);
     });
   return nightClub;
@@ -100,36 +100,34 @@ function nightClub(location) {
 // let restaurants = getRestaurants();
 
 router.get("/restaurants", (req, res) => {
-  (geocode(req.body.location)
-  .then( response => {
-    getRestaurants(response).then(function(result) {
-      res.send(result)
-   })
-  })
-  .catch(e => {
-    console.error(e);
-    res.error(e);
-  })
-  )
-});
-
-router.get("/visit", (req, res) => {
-  (geocode(req.body.location).then( response => {
-  Promise.all([
-    getMuseums(response),
-    getAmusementPark(response),
-    getZoo(response),
-    nightClub(response)
-  ])
-    .then(([museums,amusement_parks, zoos, nightClubs]) => {
-      res.json({ amusement_parks, zoos, nightClubs, museums });
+  geocode(req.query.location)
+    .then(response => {
+      getRestaurants(response).then(function(result) {
+        res.send(result);
+      });
     })
     .catch(e => {
       console.error(e);
       res.error(e);
     });
-  })
-  )
+});
+
+router.get("/visit", (req, res) => {
+  geocode(req.query.location).then(response => {
+    Promise.all([
+      getMuseums(response),
+      getAmusementPark(response),
+      getZoo(response),
+      nightClub(response)
+    ])
+      .then(([museums, amusement_parks, zoos, nightClubs]) => {
+        res.json({ amusement_parks, zoos, nightClubs, museums });
+      })
+      .catch(e => {
+        console.error(e);
+        res.error(e);
+      });
+  });
 });
 
 module.exports = router;
