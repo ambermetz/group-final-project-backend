@@ -2,6 +2,7 @@ const express = require("express");
 const cors = require("cors");
 const app = express();
 const router = require("./routes");
+const itinerary = require("./itinerary.api");
 const pool = require("./connections"); //added after connection.js set-up
 // const googleMapsClient = require("@google/maps").createClient({
 //   key: "AIzaSyAD2FKgCts12KdWq0lVY7TJjEcP4e7RkoU",
@@ -11,6 +12,7 @@ const pool = require("./connections"); //added after connection.js set-up
 app.use(cors());
 app.use(express.json());
 app.use("/", router);
+app.use("/", itinerary);
 
 const port = 8080;
 app.listen(port, () => console.log(`Server running on PORT:  ${port}!`));
