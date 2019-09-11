@@ -71,17 +71,23 @@ function nightClub() {
     });
   return nightClub;
 }
+let restaurants = getRestaurants();
 
-router.get("/", (req, res) => {
+router.get("/restaurants", (req, res) => {
+    restaurants.then(function(result) {
+      res.send(result)
+   })
+});
+
+router.get("/visit", (req, res) => {
   Promise.all([
     getMuseums(),
-    getRestaurants(),
     getAmusementPark(),
     getZoo(),
     nightClub()
   ])
-    .then(([museums,restaurants,amusement_parks, zoos, nightClubs]) => {
-      res.json({ amusement_parks, zoos, nightClubs, museums, restaurants });
+    .then(([museums,amusement_parks, zoos, nightClubs]) => {
+      res.json({ amusement_parks, zoos, nightClubs, museums });
     })
     .catch(e => {
       console.error(e);
