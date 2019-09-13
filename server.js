@@ -9,10 +9,11 @@ const pool = require("./connections"); //added after connection.js set-up
 //   Promise: Promise
 // });
 
+// app.use(express.static(__dirname + "/dist"));
 app.use(cors());
 app.use(express.json());
 app.use("/", router);
 app.use("/", itinerary);
 
-const port = 8080;
+const port = process.env.PORT || 8080;
 app.listen(port, () => console.log(`Server running on PORT:  ${port}!`));

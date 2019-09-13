@@ -13,7 +13,7 @@ itinerary.get("/itinerary", selectItinerary);
 itinerary.post("/itinerary", (req, res) => {
   pool
     .query(
-      "insert into Itinerary (name, opening_hours, rating, vicinity, startdatetime, city) values ($1::text, $2::text, $3::smallint, $4::text, $5::text, $6::text)",
+      "insert into Itinerary (name, opening_hours, rating, vicinity, startdatetime, city) values ($1::text, $2::text, $3::numeric, $4::text, $5::text, $6::text)",
       [
         req.body.name,
         req.body.opening_hours,
