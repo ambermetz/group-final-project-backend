@@ -14,9 +14,8 @@
     "@google/maps": "^0.5.5",
     "cors": "^2.8.5",
     "express": "^4.17.1",
-    "pg": "^7.12.1"
-  },
-  "devDependencies": {
+    "pg": "^7.12.1",
     "dotenv": "^8.1.0"
-  }
+  },
+  "devDependencies": {}
 }
