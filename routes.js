@@ -6,9 +6,32 @@ const googleMapsClient = require("@google/maps").createClient({
   key: "AIzaSyBTZL4n7tQe8N4VMj9UPTTqOmWUGtO-JHw",
   Promise: Promise
 });
+function getDirections(location, destination){
+  return googleMapsClient.directions({origin: location, destination: destination})
+  .asPromise()
+  .then(response=>{
+    console.log(response.json.routes)
+    return response.json.routes;
+  })
+}
+// function geocode(location) {
+//   console.log(location)
+//   let coordinates = googleMapsClient
+//     .geocode({ address: location })
+//     .asPromise()
+//     .then(response => {
+//       return response.json.results[0].geometry.location;
+//     })
+//     .catch(err => {
+//       //console.log(err);
+//       res.error(err);
+//     });
+//   return coordinates;
+//}
 function geocode(location) {
+  console.log(location)
   let coordinates = googleMapsClient
-    .geocode({ address: location })
+    .geocode({ "address" : location })
     .asPromise()
     .then(response => {
       return response.json.results[0].geometry.location;
@@ -17,6 +40,20 @@ function geocode(location) {
       console.log(err);
     });
   return coordinates;
+}
+function getPhotos(ref) {
+  return googleMapsClient
+    .placesPhoto({ photoreference: ref, maxwidth: 400, maxheight: 400 })
+    .asPromise()
+    .then(response => {
+      return {
+        photoreference: response.query.photoreference,
+        photoUrl:`https://${response.req.socket._host}${response.req.path}`
+      };
+    }).catch((e) => {
+      console.log(e)
+      return ref;
+    });
 }
 function getRestaurants(location) {
   let restaurants = googleMapsClient
@@ -30,7 +67,8 @@ function getRestaurants(location) {
       return response.json.results;
     })
     .catch(err => {
-      console.log(err);
+      //console.log(err);
+      res.error(err);
     });
   return restaurants;
 }
@@ -46,7 +84,8 @@ function getMuseums(location) {
       return response.json.results;
     })
     .catch(err => {
-      console.log(err);
+      //console.log(err);
+      res.error(err);
     });
   return museum;
 }
@@ -62,7 +101,8 @@ function getAmusementPark(location) {
       return response.json.results;
     })
     .catch(err => {
-      console.log(err);
+      //console.log(err);
+      res.error(err);
     });
   return amusement_park;
 }
@@ -78,7 +118,8 @@ function getZoo(location) {
       return response.json.results;
     })
     .catch(err => {
-      console.log(err);
+      //console.log(err);
+      res.error(err);
     });
   return zoo;
 }
@@ -95,7 +136,8 @@ function nightClub(location) {
       return response.json.results;
     })
     .catch(err => {
-      console.log(err);
+      //console.log(err);
+      res.error(err);
     });
   return nightClub;
 }
@@ -103,34 +145,62 @@ function nightClub(location) {
 
 // persists data across our application.
 router.get("/restaurants", (req, res) => {
+  console.log(req)
   geocode(req.query.location)
-    .then(response => {
-      getRestaurants(response).then(function(result) {
-        res.send(result);
+    .then(response =>
+       getRestaurants(response))
+    .then(result => {
+      const photoPromises = [];
+      result.forEach(event => {
+         photoPromises.push(getPhotos(event
+          .photos[0].photo_reference
+          ));
+        //  console.log(photoPromises);
       });
+      
+        //  return Promise.all([Promise.resolve(result)
+        //   , ...photoPromises
+        return  Promise.all([Promise.resolve(result)
+          , ...photoPromises
+        ]);
+       
+    })
+    .then(([result, ...photos
+    ]) => {
+      res.json({ result, photos })
     })
     .catch(e => {
-      console.error(e);
-      res.error(e);
+      //console.error(e);
+      res.status(500);
+      res.send(e.message);
     });
 });
+router.get("/directions", (req, res) => {
+  getDirections([42.526450, -83.143426], [42.532866, -83.143578]).then(response=>{
+    Promise.resolve(response)
+  })
+  .then((response)=> {
+    res.json(response)
+  })
 
-router.get("/visit", (req, res) => {
-  geocode(req.query.location).then(response => {
-    Promise.all([
-      getMuseums(response),
-      getAmusementPark(response),
-      getZoo(response),
-      nightClub(response)
-    ])
-      .then(([museums, amusement_parks, zoos, nightClubs]) => {
-        res.json({ amusement_parks, zoos, nightClubs, museums });
-      })
-      .catch(e => {
-        console.error(e);
-        res.error(e);
-      });
+})
+  router.get("/visit", (req, res) => {
+    geocode(req.query.location).then(response => {
+      Promise.all([
+        getMuseums(response),
+        getAmusementPark(response),
+        getZoo(response),
+        nightClub(response)
+      ])
+        .then(([museums, amusement_parks, zoos, nightClubs]) => {
+          res.json({ amusement_parks, zoos, nightClubs, museums });
+        })
+        .catch(e => {
+          console.error(e);
+          res.error(e);
+        });
+    });
   });
-});
+  
 
 module.exports = router;
