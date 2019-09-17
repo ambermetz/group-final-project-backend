@@ -3,9 +3,14 @@ const itinerary = express.Router();
 const pool = require("./connections");
 
 function selectItinerary(req, res) {
-  pool.query("select * from Itinerary").then(result => {
-    res.send(result.rows);
-  });
+  pool
+    .query("select * from Itinerary")
+    .then(result => {
+      res.send(result.rows);
+    })
+    .catch(e => {
+      console.log(e);
+    });
 }
 
 //
