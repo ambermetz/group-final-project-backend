@@ -4,18 +4,9 @@ const pool = require("./connections");
 
 function selectItinerary(req, res) {
   pool
-<<<<<<< Updated upstream
-    .query("select * from Itinerary")
-    .then(result => {
-      res.send(result.rows);
-    })
-    .catch(e => {
-      console.log(e);
-=======
     .query("select * from Itinerary order by startdatetime ASC")
     .then(result => {
       res.send(result.rows);
->>>>>>> Stashed changes
     });
 }
 

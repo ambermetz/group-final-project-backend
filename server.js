@@ -16,5 +16,5 @@ app.use("/", router);
 app.use("/", itinerary);
 
 // const port = process.env.PORT;
-const port = 8080;
+const port = 3000;
 app.listen(port, () => console.log(`Server running on PORT:  ${port}!`));
