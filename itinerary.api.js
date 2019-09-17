@@ -8,6 +8,7 @@ function selectItinerary(req, res) {
   });
 }
 
+//
 itinerary.get("/itinerary", selectItinerary);
 
 itinerary.post("/itinerary", (req, res) => {

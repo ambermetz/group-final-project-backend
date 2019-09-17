@@ -99,6 +99,7 @@ function nightClub(location) {
 }
 // let restaurants = getRestaurants();
 
+// persists data across our application.
 router.get("/restaurants", (req, res) => {
   geocode(req.query.location)
     .then(response => {
