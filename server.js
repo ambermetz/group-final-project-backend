@@ -15,5 +15,6 @@ app.use(cors());
 app.use("/", router);
 app.use("/", itinerary);
 
-const port = process.env.PORT;
+// const port = process.env.PORT;
+const port = 8080;
 app.listen(port, () => console.log(`Server running on PORT:  ${port}!`));

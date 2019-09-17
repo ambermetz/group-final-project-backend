@@ -1,5 +1,7 @@
 const express = require("express");
 const router = express.Router();
+// our api for accessing google maps api.  googleMapsClient is a library that allows us to use methods from googleMaps client to access Google maps api.
+// using a proxy server
 const googleMapsClient = require("@google/maps").createClient({
   key: "AIzaSyBTZL4n7tQe8N4VMj9UPTTqOmWUGtO-JHw",
   Promise: Promise

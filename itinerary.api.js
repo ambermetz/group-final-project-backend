@@ -4,17 +4,29 @@ const pool = require("./connections");
 
 function selectItinerary(req, res) {
   pool
+<<<<<<< Updated upstream
     .query("select * from Itinerary")
     .then(result => {
       res.send(result.rows);
     })
     .catch(e => {
       console.log(e);
+=======
+    .query("select * from Itinerary order by startdatetime ASC")
+    .then(result => {
+      res.send(result.rows);
+>>>>>>> Stashed changes
     });
 }
 
 //
 itinerary.get("/itinerary", selectItinerary);
+
+itinerary.delete("/itinerary/:id", (req, res) => {
+  pool.query(`delete from Itinerary where id = ${req.params.id}`).then(() => {
+    selectItinerary(req, res);
+  });
+});
 
 itinerary.post("/itinerary", (req, res) => {
   pool
