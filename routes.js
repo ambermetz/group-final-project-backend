@@ -1,7 +1,6 @@
 const express = require("express");
 const router = express.Router();
-// our api for accessing google maps api.  googleMapsClient is a library that allows us to use methods from googleMaps client to access Google maps api.
-// using a proxy server
+
 const googleMapsClient = require("@google/maps").createClient({
   key: "AIzaSyBTZL4n7tQe8N4VMj9UPTTqOmWUGtO-JHw",
   Promise: Promise
@@ -10,27 +9,12 @@ function getDirections(location, destination){
   return googleMapsClient.directions({origin: location, destination: destination})
   .asPromise()
   .then(response=>{
-    console.log(response.json.routes[0].legs[0].steps)
     return response.json.routes[0].legs[0].steps;
   })
 }
-// function geocode(location) {
-//   console.log(location)
-//   let coordinates = googleMapsClient
-//     .geocode({ address: location })
-//     .asPromise()
-//     .then(response => {
-//       return response.json.results[0].geometry.location;
-//     })
-//     .catch(err => {
-//       //console.log(err);
-//       res.error(err);
-//     });
-//   return coordinates;
-//}
+
 function geocode(location) {
-  console.log(location)
-  let coordinates = googleMapsClient
+    let coordinates = googleMapsClient
     .geocode({ "address" : location })
     .asPromise()
     .then(response => {
@@ -141,11 +125,8 @@ function nightClub(location) {
     });
   return nightClub;
 }
-// let restaurants = getRestaurants();
 
-// persists data across our application.
 router.get("/restaurants", (req, res) => {
-  console.log(req)
   geocode(req.query.location)
     .then(response =>
        getRestaurants(response))
@@ -155,11 +136,7 @@ router.get("/restaurants", (req, res) => {
          photoPromises.push(getPhotos(event
           .photos[0].photo_reference
           ));
-        //  console.log(photoPromises);
       });
-      
-        //  return Promise.all([Promise.resolve(result)
-        //   , ...photoPromises
         return  Promise.all([Promise.resolve(result)
           , ...photoPromises
         ]);
@@ -176,13 +153,15 @@ router.get("/restaurants", (req, res) => {
     });
 });
 router.get("/directions", (req, res) => {
-  getDirections(req.query.location, req.query.destination).then(response=>{
+  getDirections(req.query.location, req.query.destination)
+
+  .then(response=>{
     return Promise.resolve(response)
   })
   .then((response)=> {
     res.json(response)
   })
-
+  console.log(req)
 })
   router.get("/visit", (req, res) => {
     geocode(req.query.location).then(response => {
