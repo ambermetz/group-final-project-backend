@@ -10,8 +10,8 @@ function getDirections(location, destination){
   return googleMapsClient.directions({origin: location, destination: destination})
   .asPromise()
   .then(response=>{
-    console.log(response.json.routes)
-    return response.json.routes;
+    console.log(response.json.routes[0].legs[0].steps)
+    return response.json.routes[0].legs[0].steps;
   })
 }
 // function geocode(location) {
@@ -176,8 +176,8 @@ router.get("/restaurants", (req, res) => {
     });
 });
 router.get("/directions", (req, res) => {
-  getDirections([42.526450, -83.143426], [42.532866, -83.143578]).then(response=>{
-    Promise.resolve(response)
+  getDirections(req.query.location, req.query.destination).then(response=>{
+    return Promise.resolve(response)
   })
   .then((response)=> {
     res.json(response)
