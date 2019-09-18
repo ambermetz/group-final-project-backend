@@ -73,6 +73,7 @@ function getMuseums(location) {
     });
   return museum;
 }
+
 function getAmusementPark(location) {
   let amusement_park = googleMapsClient
     .placesNearby({
@@ -89,6 +90,23 @@ function getAmusementPark(location) {
       res.error(err);
     });
   return amusement_park;
+}
+function getTheatre(location) {
+  let movie_theatre = googleMapsClient
+    .placesNearby({
+      location: location,
+      radius: 3000000,
+      type: "movie_theatre"
+    })
+    .asPromise()
+    .then(response => {
+      return response.json.results;
+    })
+    .catch(err => {
+      //console.log(err);
+      res.error(err);
+    });
+  return movie_theatre;
 }
 function getZoo(location) {
   let zoo = googleMapsClient
@@ -161,7 +179,7 @@ router.get("/directions", (req, res) => {
   .then((response)=> {
     res.json(response)
   })
-  console.log(req)
+  // console.log(req)
 })
   router.get("/visit", (req, res) => {
     geocode(req.query.location).then(response => {
@@ -169,10 +187,11 @@ router.get("/directions", (req, res) => {
         getMuseums(response),
         getAmusementPark(response),
         getZoo(response),
-        nightClub(response)
+        nightClub(response),
+        getTheatre(response)
       ])
-        .then(([museums, amusement_parks, zoos, nightClubs]) => {
-          res.json({ amusement_parks, zoos, nightClubs, museums });
+        .then(([museums, amusement_parks, zoos, nightClubs, movie_theatre]) => {
+          res.json({ amusement_parks, zoos, nightClubs, museums, movie_theatre});
         })
         .catch(e => {
           console.error(e);
