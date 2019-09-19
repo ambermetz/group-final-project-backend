@@ -1,18 +1,17 @@
 const express = require("express");
 const router = express.Router();
-// our api for accessing google maps api.  googleMapsClient is a library that allows us to use methods from googleMaps client to access Google maps api.
-// using a proxy server
 const googleMapsClient = require("@google/maps").createClient({
   key: "AIzaSyBTZL4n7tQe8N4VMj9UPTTqOmWUGtO-JHw",
   Promise: Promise
 });
-function getDirections(location, destination){
-  return googleMapsClient.directions({origin: location, destination: destination})
-  .asPromise()
-  .then(response=>{
-    console.log(response.json.routes[0].legs[0].steps)
-    return response.json.routes[0].legs[0].steps;
-  })
+function getDirections(location, destination) {
+  return googleMapsClient
+    .directions({ origin: location, destination: destination })
+    .asPromise()
+    .then(response => {
+      console.log(response.json.routes[0].legs[0].steps);
+      return response.json.routes[0].legs[0].steps;
+    });
 }
 // function geocode(location) {
 //   console.log(location)
@@ -29,9 +28,9 @@ function getDirections(location, destination){
 //   return coordinates;
 //}
 function geocode(location) {
-  console.log(location)
+  console.log(location);
   let coordinates = googleMapsClient
-    .geocode({ "address" : location })
+    .geocode({ address: location })
     .asPromise()
     .then(response => {
       return response.json.results[0].geometry.location;
@@ -48,10 +47,11 @@ function getPhotos(ref) {
     .then(response => {
       return {
         photoreference: response.query.photoreference,
-        photoUrl:`https://${response.req.socket._host}${response.req.path}`
+        photoUrl: `https://${response.req.socket._host}${response.req.path}`
       };
-    }).catch((e) => {
-      console.log(e)
+    })
+    .catch(e => {
+      console.log(e);
       return ref;
     });
 }
@@ -145,29 +145,22 @@ function nightClub(location) {
 
 // persists data across our application.
 router.get("/restaurants", (req, res) => {
-  console.log(req)
+  console.log(req);
   geocode(req.query.location)
-    .then(response =>
-       getRestaurants(response))
+    .then(response => getRestaurants(response))
     .then(result => {
       const photoPromises = [];
       result.forEach(event => {
-         photoPromises.push(getPhotos(event
-          .photos[0].photo_reference
-          ));
+        photoPromises.push(getPhotos(event.photos[0].photo_reference));
         //  console.log(photoPromises);
       });
-      
-        //  return Promise.all([Promise.resolve(result)
-        //   , ...photoPromises
-        return  Promise.all([Promise.resolve(result)
-          , ...photoPromises
-        ]);
-       
+
+      //  return Promise.all([Promise.resolve(result)
+      //   , ...photoPromises
+      return Promise.all([Promise.resolve(result), ...photoPromises]);
     })
-    .then(([result, ...photos
-    ]) => {
-      res.json({ result, photos })
+    .then(([result, ...photos]) => {
+      res.json({ result, photos });
     })
     .catch(e => {
       //console.error(e);
@@ -176,31 +169,30 @@ router.get("/restaurants", (req, res) => {
     });
 });
 router.get("/directions", (req, res) => {
-  getDirections(req.query.location, req.query.destination).then(response=>{
-    return Promise.resolve(response)
-  })
-  .then((response)=> {
-    res.json(response)
-  })
-
-})
-  router.get("/visit", (req, res) => {
-    geocode(req.query.location).then(response => {
-      Promise.all([
-        getMuseums(response),
-        getAmusementPark(response),
-        getZoo(response),
-        nightClub(response)
-      ])
-        .then(([museums, amusement_parks, zoos, nightClubs]) => {
-          res.json({ amusement_parks, zoos, nightClubs, museums });
-        })
-        .catch(e => {
-          console.error(e);
-          res.error(e);
-        });
+  getDirections(req.query.location, req.query.destination)
+    .then(response => {
+      return Promise.resolve(response);
+    })
+    .then(response => {
+      res.json(response);
     });
+});
+router.get("/visit", (req, res) => {
+  geocode(req.query.location).then(response => {
+    Promise.all([
+      getMuseums(response),
+      getAmusementPark(response),
+      getZoo(response),
+      nightClub(response)
+    ])
+      .then(([museums, amusement_parks, zoos, nightClubs]) => {
+        res.json({ amusement_parks, zoos, nightClubs, museums });
+      })
+      .catch(e => {
+        console.error(e);
+        res.error(e);
+      });
   });
-  
+});
 
 module.exports = router;
